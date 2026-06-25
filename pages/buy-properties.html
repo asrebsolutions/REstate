@@ -91,6 +91,7 @@
       <li><a href="buy-properties.html" class="active">Buy Properties</a></li>
       <li><a href="sell-property.html">Sell Your Property</a></li>
     </ul>
+    <a href="contact.html" class="nav-cta-btn">Contact Us</a>
     <button class="hamburger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
   <div class="mobile-menu" id="mobile-menu">
@@ -109,7 +110,7 @@
     <div class="gold-rule"></div>
   </div>
 </section>
-  
+
 <section class="section-sm" style="background:var(--navy);border-bottom:1px solid rgba(201,166,107,0.2)">
   <div class="container">
     <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -310,8 +311,8 @@
       <h2 style="color:var(--white)">Tell us what you're looking for.<br><em>We'll help you find it.</em></h2>
       <p>Our referral network extends beyond the listings shown here. Contact us with your requirements and budget.</p>
       <div class="cta-pair">
-        <a href="contact.html" class="btn btn-gold">Contact Us →</a>
-        <a href="#listings" class="btn btn-outline-white">Back to Listings</a>
+        <a href="#listings" class="btn btn-gold">View Listings →</a>
+        <a href="#loan" class="btn btn-outline-white">Bank Loan Assistance</a>
       </div>
     </div>
   </div>
@@ -323,7 +324,7 @@
       <div class="footer-brand"><div class="fb-name">ALAS <span>Property Solutions</span></div><p>Helping Filipino families navigate real estate transactions, settle estates, and transfer inherited property.</p></div>
       <div class="footer-col"><h5>Estate Settlement</h5><ul><li><a href="estate-settlement.html#guide">Free Guide</a></li><li><a href="estate-settlement.html#assessment">Free Assessment</a></li><li><a href="estate-settlement.html#faq">FAQ</a></li></ul></div>
       <div class="footer-col"><h5>Buy &amp; Sell</h5><ul><li><a href="buy-properties.html#listings">Buy Properties</a></li><li><a href="sell-property.html">Sell Your Property</a></li><li><a href="buy-properties.html#loan">Bank Loan</a></li></ul></div>
-      <div class="footer-col"><h5>More</h5><ul><li><a href="amla-compliance.html">AMLA Compliance</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+      <div class="footer-col"><h5>More</h5><ul><li><a href="contact.html">Contact</a></li></ul></div>
     </div>
     <div class="footer-bottom">
       <div class="fb-left">ALAS Property Solutions &nbsp;|&nbsp; Angeli Abad Santos, PRC Licensed Real Estate Broker &nbsp;|&nbsp; Lic. No. 0012901 &nbsp;|&nbsp; © 2025</div>
@@ -334,7 +335,7 @@
 
 <script>
 // ══════════════════════════════════════════════════════
-//  CONFIGURATION — REPLACE WITH YOUR GOOGLE SHEET ID
+//  CONFIGURATION
 // ══════════════════════════════════════════════════════
 const SHEET_ID   = '1cZrtdy9DOA8JxHDTeMJYgE4w4Do30w3MtXEnVg93g4k';
 const SHEET_NAME = 'Listings';
@@ -364,22 +365,20 @@ let touchStartX = 0;
 
 // ── FETCH — uses CSV export (only needs Sheet shared as "Anyone with link") ──
 async function loadListings() {
-  // CSV export URL — works as long as Sheet is shared publicly (no publishing needed)
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
   try {
     const res  = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status} — check Sheet is shared publicly`);
     const csv  = await res.text();
 
-    // Parse CSV properly (handles quoted fields with commas and newlines)
     const rows   = parseCSV(csv);
     if (rows.length < 2) throw new Error('Sheet returned no data');
 
     const headers = rows[0].map(h => h.trim());
-    // Row index 1 is the notes/instructions row — skip it
-    // Data starts at row index 2
-    allListings = rows.slice(2)
-      .filter(r => r[0] && r[0].trim())   // skip empty rows
+    // NOTE: rows.slice(1) assumes data starts right after headers (row 2).
+    // If your Sheet has an extra notes/instructions row, change to rows.slice(2)
+    allListings = rows.slice(1)
+      .filter(r => r[0] && r[0].trim())
       .map(r => {
         const obj = {};
         headers.forEach((h, i) => { obj[h] = (r[i] || '').trim(); });
@@ -398,7 +397,6 @@ async function loadListings() {
   }
 }
 
-// RFC 4180 CSV parser — handles quoted fields with embedded commas and newlines
 function parseCSV(text) {
   const rows = [];
   let row = [], field = '', inQuotes = false;
@@ -433,14 +431,12 @@ function buildFilterButtons() {
 function normalizeType(raw) { return TYPE_MAP[(raw||'').toLowerCase()] || 'other'; }
 function getPhotos(l) { return PHOTO_COLS.map(col => l[col] || '').filter(Boolean); }
 
-// ── RENDER CARDS ──
 function renderListings(list) {
   const grid = document.getElementById('listing-grid');
   if (!list.length) {
     grid.innerHTML = '<p style="color:var(--grey);font-size:0.9rem;padding:20px 0">No properties found. Please check back soon.</p>';
     return;
   }
-  // Always use the index from allListings so openModal works correctly after filtering
   grid.innerHTML = list.map(l => {
     const originalIdx = allListings.indexOf(l);
     return cardHTML(l, originalIdx);
@@ -448,7 +444,6 @@ function renderListings(list) {
 }
 
 function cardHTML(l, idx) {
-  // idx is ALWAYS the index in allListings — safe across filtering
   const type    = normalizeType(l['Property Type']);
   const status  = l['Status'] || 'For Sale';
   const tagCls  = (status.toLowerCase().includes('lease')||status.toLowerCase().includes('rent')) ? 'tag-rent' : 'tag-sale';
@@ -468,7 +463,6 @@ function cardHTML(l, idx) {
     l['Floor Area (sqm)'] ? l['Floor Area (sqm)']+'sqm floor': '',
     l['Garage'] || ''
   ].filter(Boolean).map(h=>`<span class="hi-tag">${escHtml(h)}</span>`).join('');
-  // data-idx stores the ORIGINAL index in allListings — click always opens the right listing
   return `<div class="listing-card" data-type="${type}" data-idx="${idx}" onclick="openModal(this.dataset.idx)">
     <div class="listing-img">
       <span class="listing-tag ${tagCls}">${escHtml(status)}</span>
@@ -492,7 +486,6 @@ function filterListings(type,btn) {
   renderListings(type==='all' ? allListings : allListings.filter(l=>normalizeType(l['Property Type'])===type));
 }
 
-// ── GALLERY ──
 function buildGallery(photos) {
   gPhotos=photos; gCurrent=0;
   const slides=document.getElementById('gallery-slides');
@@ -530,7 +523,6 @@ function updateGalleryUI(){
   document.getElementById('gallery-next').classList.toggle('hidden',gCurrent===n-1);
 }
 
-// Touch swipe
 document.addEventListener('touchstart',e=>{if(document.getElementById('listing-modal').classList.contains('open'))touchStartX=e.touches[0].clientX;},{passive:true});
 document.addEventListener('touchend',e=>{
   if(!document.getElementById('listing-modal').classList.contains('open'))return;
@@ -538,7 +530,6 @@ document.addEventListener('touchend',e=>{
   if(Math.abs(diff)>40)galleryMove(diff>0?1:-1);
 },{passive:true});
 
-// ── MODAL ──
 function openModal(idx) {
   const i = parseInt(idx, 10);
   const l = allListings[i];
