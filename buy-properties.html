@@ -366,7 +366,7 @@ let touchStartX = 0;
 
 // ── FETCH — uses CSV export (only needs Sheet shared as "Anyone with link") ──
 async function loadListings() {
- const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-nOy58cNFmaRsIWhczwDTYBc7NwDum5SptZg8TWzFD5462X1Jkfx33KcnTzCJKqU5jWq_yiN8ZQ8/pub?gid=445509934&single=true&output=csv';
+ const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmTx205hskwRgSDa3b-3tnrUlWOpWILHqFTp3wTtJ_FEZWSOcGSuWyBfp-oSSi8Iu-ZrRPM7Vh4Skx/pub?gid=445509934&single=true&output=csv";
   try {
     const res  = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status} — check Sheet is shared publicly`);
@@ -420,6 +420,7 @@ function parseCSV(text) {
   return rows;
 }
 
+  
 function buildFilterButtons() {
   const types = [...new Set(allListings.map(l => normalizeType(l['Property Type'])))].filter(Boolean);
   const bar   = document.getElementById('filter-bar');
