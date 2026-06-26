@@ -304,8 +304,8 @@ window.addEventListener('scroll',()=>{
 });
 
 // ═══ GOOGLE SHEETS LISTINGS FETCH ═══
-const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1cZrtdy9DOA8JxHDTeMJYgE4w4Do30w3MtXEnVg93g4k/pub?output=csv";
-
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-nOy58cNFmaRsIWhczwDTYBc7NwDum5SptZg8TWzFD5462X1Jkfx33KcnTzCJKqU5jWq_yiN8ZQ8/pub?gid=445509934&single=true&output=csv';
+const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-nOy58cNFmaRsIWhczwDTYBc7NwDum5SptZg8TWzFD5462X1Jkfx33KcnTzCJKqU5jWq_yiN8ZQ8/pub?gid=445509934&single=true&output=csv';
 function parseCSV(text) {
   const rows = [];
   let row = [], val = '', inQuotes = false;
