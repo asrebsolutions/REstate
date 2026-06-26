@@ -432,18 +432,58 @@ function buildFilterButtons() {
 function normalizeType(raw) { return TYPE_MAP[(raw||'').toLowerCase()] || 'other'; }
 function getPhotos(l) { return PHOTO_COLS.map(col => l[col] || '').filter(Boolean); }
 
-function renderListings(list) {
-  const grid = document.getElementById('listing-grid');
-  if (!list.length) {
-    grid.innerHTML = '<p style="color:var(--grey);font-size:0.9rem;padding:20px 0">No properties found. Please check back soon.</p>';
+function renderListings(rows) {
+  const grid = document.getElementById('listings-grid');
+  if (!rows || rows.length < 3) {
+    grid.innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--grey);">No listings available right now. Please check back soon.</p>';
     return;
   }
-  grid.innerHTML = list.map(l => {
-    const originalIdx = allListings.indexOf(l);
-    return cardHTML(l, originalIdx);
+
+  const headers = rows[0].map(h => h.trim());
+  const idx = (name) => headers.indexOf(name);
+
+  const nameIdx  = idx('Property Name');
+  const priceIdx = idx('Price Display');
+  const locIdx   = idx('Location / City');
+  const statusIdx = idx('Status');
+  const photoIdx = idx('Photo URL 1');
+
+  // Skip row 1 (headers) AND row 2 (notes) — data starts at row 3
+  const dataRows = rows.slice(2).filter(r => r[nameIdx] && r[nameIdx].trim() !== '');
+
+  if (dataRows.length === 0) {
+    grid.innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--grey);">No listings available right now. Please check back soon.</p>';
+    return;
+  }
+
+  // Only show "For Sale" listings, skip Sold/Hidden
+  const activeRows = dataRows.filter(r => {
+    const status = (r[statusIdx] || '').trim().toLowerCase();
+    return !['sold','hidden'].includes(status);
+  });
+
+  const previewRows = activeRows.slice(0, 6);
+
+  grid.innerHTML = previewRows.map(r => {
+    const title = r[nameIdx] || 'Property Listing';
+    const price = r[priceIdx] || '';
+    const loc   = r[locIdx] || '';
+    const img   = photoIdx !== -1 ? r[photoIdx] : '';
+    const link  = 'pages/buy-properties.html';
+
+    return `
+      <a href="${link}" style="text-decoration:none;display:block;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--white);transition:box-shadow .2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
+        ${img ? `<div style="width:100%;height:180px;background:url('${img}') center/cover;"></div>` : `<div style="width:100%;height:180px;background:var(--gold-pale);display:flex;align-items:center;justify-content:center;color:var(--grey);font-size:0.85rem;">No Image</div>`}
+        <div style="padding:16px;">
+          <h4 style="margin:0 0 6px;font-size:1rem;color:var(--navy);">${title}</h4>
+          ${loc ? `<p style="margin:0 0 6px;font-size:0.85rem;color:var(--grey);">${loc}</p>` : ''}
+          ${price ? `<p style="margin:0;font-weight:700;color:var(--gold);">${price}</p>` : ''}
+        </div>
+      </a>
+    `;
   }).join('');
 }
-
+  
 function cardHTML(l, idx) {
   const type    = normalizeType(l['Property Type']);
   const status  = l['Status'] || 'For Sale';
