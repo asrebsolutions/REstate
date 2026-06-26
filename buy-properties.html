@@ -341,7 +341,6 @@
 // ══════════════════════════════════════════════════════
 const SHEET_ID   = '1cZrtdy9DOA8JxHDTeMJYgE4w4Do30w3MtXEnVg93g4k';
 const SHEET_NAME = 'Listings';
-https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-nOy58cNFmaRsIWhczwDTYBc7NwDum5SptZg8TWzFD5462X1Jkfx33KcnTzCJKqU5jWq_yiN8ZQ8/pub?gid=445509934&single=true&output=csv
 const TYPE_MAP = {
   'townhouse':'house','house and lot':'house','house':'house',
   'condominium':'condo','condo':'condo',
@@ -379,7 +378,7 @@ async function loadListings() {
     const headers = rows[0].map(h => h.trim());
     // NOTE: rows.slice(1) assumes data starts right after headers (row 2).
     // If your Sheet has an extra notes/instructions row, change to rows.slice(2)
-    allListings = rows.slice(1)
+    allListings = rows.slice(2)
       .filter(r => r[0] && r[0].trim())
       .map(r => {
         const obj = {};
