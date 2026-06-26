@@ -365,7 +365,7 @@ let touchStartX = 0;
 
 // ── FETCH — uses CSV export (only needs Sheet shared as "Anyone with link") ──
 async function loadListings() {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+  const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRmTx205hskwRgSDa3b-3tnrUlWOpWILHqFTp3wTtJ_FEZWSOcGSuWyBfp-oSSi8Iu-ZrRPM7Vh4Skx/pub?gid=445509934&single=true&output=csv';
   try {
     const res  = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status} — check Sheet is shared publicly`);
