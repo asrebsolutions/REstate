@@ -377,7 +377,7 @@ async function loadListings() {
     const headers = rows[0].map(h => h.trim());
     // NOTE: rows.slice(1) assumes data starts right after headers (row 2).
     // If your Sheet has an extra notes/instructions row, change to rows.slice(2)
-    allListings = rows.slice(1)
+    allListings = rows.slice(2)
       .filter(r => r[0] && r[0].trim())
       .map(r => {
         const obj = {};
